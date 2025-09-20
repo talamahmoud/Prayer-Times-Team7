@@ -1,11 +1,112 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prayer Times App</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
 </head>
 <body>
-    
+  <main class="container">
+    <header>
+      <h1 class="title">Prayer Times</h1>
+      <p class="lead">Select a continent, then a country, then a city to display prayer times with a countdown to the next prayer.</p>
+    </header>
+
+    <section class="controls" aria-label="Location selection options">
+      <div class="field">
+        <label for="continent">Continent</label>
+        <select id="continent" aria-label="Select continent">
+          <option value=""> Select Continent</option>
+          <option value="africa">Africa</option>
+          <option value="americas">Americas</option>
+          <option value="asia">Asia</option>
+          <option value="europe">Europe</option>
+          <option value="oceania">Oceania</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="country">Country</label>
+        <select id="country" aria-label="Select country">
+          <option value="">Select a continent first</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="city">City</label>
+        <select id="city" aria-label="Select city">
+          <option value="">Select a country first</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="method">Calculation Method</label>
+        <select id="method" aria-label="Select calculation method">
+          <option value="">Select one</option>
+        </select>
+      </div>
+    </section>
+    <div class="actions">
+        <button id="resetBtn" class="btn secondary" title="Reset">
+           Reset
+        </button>
+      </div>
+
+    <section id="nextPrayer" class="next-prayer" aria-live="polite">
+        <div class="next-banner">
+            <div class="next-left">
+                <i class="fa-regular fa-clock"></i>
+                <div class="prayer-name">Next Prayer: Asr</div>
+                <div class="small-muted">Today — 15:30</div>
+            </div>
+            <div>
+                <div class="countdown">01:25:12</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="prayerTableWrap">
+        <div class="table-card">
+            <table class="prayer-table" aria-label="Prayer times table">
+                <thead>
+                <tr>
+                    <th>Prayer</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Fajr</td>
+                    <td>05:00 AM</td>
+                </tr>
+                <tr>
+                    <td>Dhuhr</td>
+                    <td>12:10 PM</td>
+                </tr>
+                <tr>
+                    <td>Asr</td>
+                    <td>03:30 PM</td>
+                </tr>
+                <tr>
+                    <td>Maghrib</td>
+                    <td>06:45 PM</td>
+                </tr>
+                <tr>
+                    <td>Isha</td>
+                    <td>08:00 PM</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+    <footer>
+      <small>Team 7</small>
+    </footer>
+  </main>
+
+  <script type="module" src="src/app.js"></script>
 </body>
 </html>
