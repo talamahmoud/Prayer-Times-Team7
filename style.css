@@ -14,7 +14,6 @@ body{
   background:var(--bg);
   margin:0;
   color:#0f172a;
-  direction:ltr;
 }
 
 .container{
@@ -40,15 +39,6 @@ header h1{
     display:flex;
     flex-wrap:wrap;
     gap:12px;
-    /* margin-bottom:14px;
-    align-items:end;
-    border: 1px solid ;
-    border-radius: 8px;
-    padding: 20px;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    -ms-border-radius: 8px;
-    -o-border-radius: 8px; */
     background:var(--card);
     padding:14px;
     border-radius:10px;
@@ -57,7 +47,7 @@ header h1{
 }
 
 .field{
-    flex:1 1 200px;
+    flex:1 1 50px;
     min-width:160px
 }
 
@@ -73,7 +63,6 @@ select{
     border-radius:8px;
     border:1px solid #e6e9ef;
     background:var(--card);
-    direction:ltr
 }
 
 .actions{
@@ -87,7 +76,7 @@ select{
 .btn{
     padding:8px 12px;
     border-radius:8px;
-    border:none;
+    border:1px solid transparent;
     background:var(--accent);
     color:#fff;
     cursor:pointer;
@@ -95,19 +84,30 @@ select{
     gap:8px;
     align-items:center;
     margin:auto;
+    transition: background .15s, border-color .15s, color .15s;
+    box-sizing: border-box;
+    -webkit-transition: background .15s, border-color .15s, color .15s;
+    -moz-transition: background .15s, border-color .15s, color .15s;
+    -ms-transition: background .15s, border-color .15s, color .15s;
+    -o-transition: background .15s, border-color .15s, color .15s;
 }
+
 .btn:hover{
-    border: 1px solid #6b7280;
+    border-color:#6b7280; 
 }
 
 .btn.secondary{
-    background:#6b7280
+    background:#6b7280;
+    color:#fff;
+    border:1px solid transparent; 
 }
 
 .btn.secondary:hover{
-    background: white;
+    background: #fff;
     color: #6b7280;
+    border-color: #6b7280;
 }
+
 
 .status{
     min-height:26px;
@@ -151,7 +151,6 @@ select{
 .prayer-table{
     width:100%;
     border-collapse:collapse;
-    direction:ltr
 }
 
 .prayer-table th,.prayer-table td{
