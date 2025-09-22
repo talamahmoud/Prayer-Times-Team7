@@ -1,26 +1,49 @@
 import { fetchCountriesByContinent, fetchCitiesByCountry, fetchCalculationMethods } from "./api.js";
 import { getSelection, setSelection, resetSelection } from "./storage.js";
+
 // DOM elements
 const continentSelect = document.getElementById("continent");
 const countrySelect = document.getElementById("country");
 const citySelect = document.getElementById("city");
 const methodSelect = document.getElementById("method");
+const resetBtn = document.getElementById("resetBtn");
+
+function clearOptions(select) {
+  while (select.firstChild) {
+    select.removeChild(select.firstChild);
+  }
+}
 
 // loading
 function setLoading(select, text = "Loading…") {
-  select.innerHTML = `<option value="">${text}</option>`;
+  clearOptions(select);
+  const opt = document.createElement("option");
+  opt.value = "";
+  opt.textContent = text;
+  select.appendChild(opt);
   select.disabled = true;
 }
 
 function setOptions(select, items, placeholder) {
-  select.innerHTML = `<option value="">${placeholder}</option>`;
+  clearOptions(select);
+
+  const placeholderOpt = document.createElement("option");
+  placeholderOpt.value = "";
+  placeholderOpt.textContent = placeholder;
+  select.appendChild(placeholderOpt);
+
   items.forEach(item => {
+    const opt = document.createElement("option");
     if (typeof item === "string") {
-      select.innerHTML += `<option value="${item}">${item}</option>`;
+      opt.value = item;
+      opt.textContent = item;
     } else {
-      select.innerHTML += `<option value="${item.name}">${item.name}</option>`;
+      opt.value = item.name;
+      opt.textContent = item.name;
     }
+    select.appendChild(opt);
   });
+
   select.disabled = false;
 }
 
@@ -32,14 +55,32 @@ async function initMethods(selectedMethod) {
       id,
       name: m.name
     }));
-    setOptions(methodSelect, methodArray, "Select Method");
+
+    clearOptions(methodSelect);
+    const placeholderOpt = document.createElement("option");
+    placeholderOpt.value = "";
+    placeholderOpt.textContent = "Select Method";
+    methodSelect.appendChild(placeholderOpt);
+
+    methodArray.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.id;
+      opt.textContent = m.name;
+      methodSelect.appendChild(opt);
+    });
+
     if (selectedMethod) methodSelect.value = selectedMethod;
+    methodSelect.disabled = false;
   } catch (err) {
-    methodSelect.innerHTML = `<option value="">Error loading methods</option>`;
+    clearOptions(methodSelect);
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Error loading methods";
+    methodSelect.appendChild(opt);
   }
 }
 
-// When continent changes → load countries
+// When continent changes 
 continentSelect.addEventListener("change", async e => {
   const continent = e.target.value;
   setSelection({ continent, country: "", city: "" });
@@ -52,11 +93,15 @@ continentSelect.addEventListener("change", async e => {
     const countries = await fetchCountriesByContinent(continent);
     setOptions(countrySelect, countries, "Select Country");
   } catch (err) {
-    countrySelect.innerHTML = `<option value="">Error loading countries</option>`;
+    clearOptions(countrySelect);
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Error loading countries";
+    countrySelect.appendChild(opt);
   }
 });
 
-//  When country changes → load cities
+//  When country changes
 countrySelect.addEventListener("change", async e => {
   const country = e.target.value;
   setSelection({ country, city: "" });
@@ -68,7 +113,11 @@ countrySelect.addEventListener("change", async e => {
     const cities = await fetchCitiesByCountry(country);
     setOptions(citySelect, cities, "Select City");
   } catch (err) {
-    citySelect.innerHTML = `<option value="">Error loading cities</option>`;
+    clearOptions(citySelect);
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Error loading cities";
+    citySelect.appendChild(opt);
   }
 });
 
@@ -102,5 +151,25 @@ async function init() {
   }
   await initMethods(saved.method);
 }
+
+// Reset button
+resetBtn.addEventListener("click", () => {
+  resetSelection();
+  continentSelect.value = "";
+
+  clearOptions(countrySelect);
+  const optCountry = document.createElement("option");
+  optCountry.value = "";
+  optCountry.textContent = "Select a continent first";
+  countrySelect.appendChild(optCountry);
+
+  clearOptions(citySelect);
+  const optCity = document.createElement("option");
+  optCity.value = "";
+  optCity.textContent = "Select a country first";
+  citySelect.appendChild(optCity);
+
+  methodSelect.value = "";
+});
 
 init();

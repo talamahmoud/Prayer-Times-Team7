@@ -1,13 +1,12 @@
 import { RESTCOUNTRIES_BASE, COUNTRIESNOW_CITIES, ALADHAN_BASE } from './config.js';
+import { handleFetch } from './utils.js';
 
-const cityCache = new Map(); 
+const cityCache = new Map();
 
 export async function fetchCountriesByContinent(continent) {
   if (!continent) throw new Error("Missing continent");
   const url = `${RESTCOUNTRIES_BASE}/${encodeURIComponent(continent)}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Failed to load countries");
-  const data = await res.json();
+  const data = await handleFetch(url, {}, "Failed to load countries");
   return data
     .map(c => ({ name: c.name.common, code: c.cca2 }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -20,14 +19,16 @@ export async function fetchCitiesByCountry(country) {
     return cityCache.get(country);
   }
 
-  const res = await fetch(COUNTRIESNOW_CITIES, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ country })
-  });
+  const json = await handleFetch(
+    COUNTRIESNOW_CITIES,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ country })
+    },
+    "Failed to load cities"
+  );
 
-  if (!res.ok) throw new Error("Failed to load cities");
-  const json = await res.json();
   if (!json.data) throw new Error("No cities found");
 
   const cities = Array.from(new Set(json.data)).sort((a, b) =>
@@ -38,8 +39,10 @@ export async function fetchCitiesByCountry(country) {
 }
 
 export async function fetchCalculationMethods() {
-  const res = await fetch(`${ALADHAN_BASE}/methods`);
-  if (!res.ok) throw new Error("Failed to load methods");
-  const json = await res.json();
+  const json = await handleFetch(
+    `${ALADHAN_BASE}/methods`,
+    {},
+    "Failed to load methods"
+  );
   return json.data || {};
 }
