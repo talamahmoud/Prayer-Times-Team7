@@ -1,4 +1,9 @@
-import { fetchCountriesByContinent, fetchCitiesByCountry, fetchCalculationMethods } from "./api.js";
+import {
+  fetchCountriesByContinent,
+  fetchCitiesByCountry,
+  fetchCalculationMethods,
+  fetchAdhanTimeWithMethod,
+} from "./api.js";
 import { getSelection, setSelection, resetSelection } from "./storage.js";
 
 // DOM elements
@@ -7,11 +12,20 @@ const countrySelect = document.getElementById("country");
 const citySelect = document.getElementById("city");
 const methodSelect = document.getElementById("method");
 const resetBtn = document.getElementById("resetBtn");
+const prayerTableBody = document.getElementById("table-body");
 
 function clearOptions(select) {
   while (select.firstChild) {
     select.removeChild(select.firstChild);
   }
+}
+
+function timeFormat(time) {
+  const [hours, min] = time.split(":");
+  let hour = parseInt(hours, 10);
+  let amOrPm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12;
+  return `${hour}:${min} ${amOrPm}`;
 }
 
 // loading
@@ -32,7 +46,7 @@ function setOptions(select, items, placeholder) {
   placeholderOpt.textContent = placeholder;
   select.appendChild(placeholderOpt);
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const opt = document.createElement("option");
     if (typeof item === "string") {
       opt.value = item;
@@ -52,8 +66,8 @@ async function initMethods(selectedMethod) {
     setLoading(methodSelect, "Loading methods…");
     const methods = await fetchCalculationMethods();
     const methodArray = Object.entries(methods).map(([id, m]) => ({
-      id,
-      name: m.name
+      id: m.id,
+      name: m.name,
     }));
 
     clearOptions(methodSelect);
@@ -62,7 +76,7 @@ async function initMethods(selectedMethod) {
     placeholderOpt.textContent = "Select Method";
     methodSelect.appendChild(placeholderOpt);
 
-    methodArray.forEach(m => {
+    methodArray.forEach((m) => {
       const opt = document.createElement("option");
       opt.value = m.id;
       opt.textContent = m.name;
@@ -80,8 +94,8 @@ async function initMethods(selectedMethod) {
   }
 }
 
-// When continent changes 
-continentSelect.addEventListener("change", async e => {
+// When continent changes
+continentSelect.addEventListener("change", async (e) => {
   const continent = e.target.value;
   setSelection({ continent, country: "", city: "" });
 
@@ -102,7 +116,7 @@ continentSelect.addEventListener("change", async e => {
 });
 
 //  When country changes
-countrySelect.addEventListener("change", async e => {
+countrySelect.addEventListener("change", async (e) => {
   const country = e.target.value;
   setSelection({ country, city: "" });
 
@@ -122,16 +136,40 @@ countrySelect.addEventListener("change", async e => {
 });
 
 //  When city changes
-citySelect.addEventListener("change", e => {
+citySelect.addEventListener("change", (e) => {
   setSelection({ city: e.target.value });
 });
 
 //  When method changes
-methodSelect.addEventListener("change", e => {
+methodSelect.addEventListener("change", async (e) => {
   setSelection({ method: e.target.value });
+  const methodId = e.target.value;
+
+  try {
+    const data = await fetchAdhanTimeWithMethod(citySelect.value, methodId);
+    const mainPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+    prayerTableBody.innerHTML = "";
+    Object.entries(data.timings)
+      .filter(([key]) => mainPrayers.includes(key))
+      .forEach(([key, value]) => {
+        const fajrTr = document.createElement("tr");
+        const lableTd = document.createElement("td");
+        const valueTd = document.createElement("td");
+
+        lableTd.textContent = key;
+        valueTd.textContent = timeFormat(value);
+
+        fajrTr.appendChild(lableTd);
+        fajrTr.appendChild(valueTd);
+        prayerTableBody.appendChild(fajrTr);
+      });
+
+  } catch (err) {
+    console.error("Error fetching Adhan time:", err);
+  }
 });
 
-//  Init 
+//  Init
 async function init() {
   const saved = getSelection();
   if (saved.continent) {
