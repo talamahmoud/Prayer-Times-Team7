@@ -13,6 +13,7 @@ const citySelect = document.getElementById("city");
 const methodSelect = document.getElementById("method");
 const resetBtn = document.getElementById("resetBtn");
 const prayerTableBody = document.getElementById("table-body");
+const typeCheckBtn = document.getElementById("type-btn");
 
 function clearOptions(select) {
   while (select.firstChild) {
@@ -20,12 +21,39 @@ function clearOptions(select) {
   }
 }
 
-function timeFormat(time) {
-  const [hours, min] = time.split(":");
+function timeFormat(time, check) {
+  const [hours, minutes] = time.split(":");
   let hour = parseInt(hours, 10);
-  let amOrPm = hour >= 12 ? "PM" : "AM";
-  hour = hour % 12 || 12;
-  return `${hour}:${min} ${amOrPm}`;
+
+  const amOrPm = hour >= 12 ? "PM" : "AM";
+
+  if (check) {
+    const hour24 = hour % 24;
+    return `${hour24}:${minutes} ${amOrPm}`;
+  } else {
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${amOrPm}`;
+  }
+}
+
+function setAdhan(prayers, timeFormatChecked) {
+  if (!prayers || !Array.isArray(prayers)) return;
+
+  prayerTableBody.innerHTML = "";
+  const mainPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
+  prayers.forEach((value, index) => {
+    const tr = document.createElement("tr");
+    const tdLabel = document.createElement("td");
+    const tdValue = document.createElement("td");
+
+    tdLabel.textContent = mainPrayers[index];
+    tdValue.textContent = timeFormat(value, timeFormatChecked);
+
+    tr.appendChild(tdLabel);
+    tr.appendChild(tdValue);
+    prayerTableBody.appendChild(tr);
+  });
 }
 
 // loading
@@ -148,24 +176,36 @@ methodSelect.addEventListener("change", async (e) => {
   try {
     const data = await fetchAdhanTimeWithMethod(citySelect.value, methodId);
     const mainPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+
     prayerTableBody.innerHTML = "";
-    Object.entries(data.timings)
+    const rows = Object.entries(data.timings)
       .filter(([key]) => mainPrayers.includes(key))
-      .forEach(([key, value]) => {
-        const fajrTr = document.createElement("tr");
-        const lableTd = document.createElement("td");
-        const valueTd = document.createElement("td");
+      .map(([key, value]) => {
+        const tr = document.createElement("tr");
+        const tdLabel = document.createElement("td");
+        const tdValue = document.createElement("td");
 
-        lableTd.textContent = key;
-        valueTd.textContent = timeFormat(value);
+        tdLabel.textContent = key;
+        tdValue.textContent = timeFormat(value, typeCheckBtn.checked);
 
-        fajrTr.appendChild(lableTd);
-        fajrTr.appendChild(valueTd);
-        prayerTableBody.appendChild(fajrTr);
+        tr.appendChild(tdLabel);
+        tr.appendChild(tdValue);
+        prayerTableBody.appendChild(tr);
+
+        return { tdValue, value };
       });
-
+    setSelection({
+      adhan: rows.map(({ value }) => value),
+    });
   } catch (err) {
     console.error("Error fetching Adhan time:", err);
+  }
+});
+typeCheckBtn.addEventListener("change", () => {
+  const saved = getSelection();
+  if (saved.adhan && Array.isArray(saved.adhan)) {
+    setAdhan(saved.adhan, typeCheckBtn.checked);
+    setSelection({ timeFormat: typeCheckBtn.checked });
   }
 });
 
@@ -188,12 +228,21 @@ async function init() {
     } catch {}
   }
   await initMethods(saved.method);
+
+  if (saved.timeFormat !== undefined) {
+    typeCheckBtn.checked = saved.timeFormat;
+  }
+
+  if (saved.adhan && Array.isArray(saved.adhan)) {
+    setAdhan(saved.adhan, saved.timeFormat);
+  }
 }
 
 // Reset button
 resetBtn.addEventListener("click", () => {
   resetSelection();
   continentSelect.value = "";
+  prayerTableBody.innerHTML = "";
 
   clearOptions(countrySelect);
   const optCountry = document.createElement("option");

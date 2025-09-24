@@ -25,15 +25,26 @@ export function getSelection() {
   return loadState();
 }
 
-export function setSelection({ continent, country, city, method }) {
+export function setSelection({
+  continent,
+  country,
+  city,
+  method,
+  adhan,
+  timeFormat,
+}) {
   const current = loadState();
   const newState = {
     ...current,
     ...(continent !== undefined && { continent }),
     ...(country !== undefined && { country }),
     ...(city !== undefined && { city }),
-    ...(method !== undefined && { method })
+    ...(method !== undefined && { method }),
+    ...(adhan !== undefined && { adhan }),
+    ...(timeFormat !== undefined && { timeFormat }),
   };
+  console.log(newState, "wowowo");
+
   saveState(newState);
 }
 
