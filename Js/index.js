@@ -5,8 +5,6 @@ import {
   fetchAdhanTimeWithMethod,
 } from "./api.js";
 import { getSelection, setSelection, resetSelection } from "./storage.js";
-
-// DOM elements
 const continentSelect = document.getElementById("continent");
 const countrySelect = document.getElementById("country");
 const citySelect = document.getElementById("city");
@@ -14,6 +12,92 @@ const methodSelect = document.getElementById("method");
 const resetBtn = document.getElementById("resetBtn");
 const prayerTableBody = document.getElementById("table-body");
 const typeCheckBtn = document.getElementById("type-btn");
+const nextPrayerEl = document.querySelector(".countdown");
+const nextPrayerNameEl = document.querySelector(".prayer-name");
+const nextPrayerDayEl = document.querySelector(".next-prayer-day");
+
+let countdownInterval = null;
+let prayerTimes = [];
+
+function getNextPrayer() {
+  if (!prayerTimes || prayerTimes.length === 0) return null;
+
+  const now = new Date();
+  const currentTime = now.getHours() * 60 + now.getMinutes();
+
+  for (let prayer of prayerTimes) {
+    const [hours, minutes] = prayer.time.split(":");
+    const prayerTimeInMinutes = parseInt(hours) * 60 + parseInt(minutes);
+
+    if (prayerTimeInMinutes > currentTime) {
+      return {
+        name: prayer.name,
+        time: prayerTimeInMinutes,
+        timeString: prayer.time,
+      };
+    }
+  }
+
+  // If no prayer left today, return first prayer of tomorrow (Fajr)
+  return {
+    name: prayerTimes[0].name,
+    time:
+      parseInt(prayerTimes[0].time.split(":")[0]) * 60 +
+      parseInt(prayerTimes[0].time.split(":")[1]) +
+      24 * 60,
+    timeString: prayerTimes[0].time,
+    tomorrow: true,
+  };
+}
+
+function startPrayerCountdown() {
+  // Clear existing countdown
+  if (countdownInterval) {
+    clearInterval(countdownInterval);
+  }
+
+  if (!nextPrayerEl) return;
+
+  const updateCountdown = () => {
+    const nextPrayer = getNextPrayer();
+
+    if (!nextPrayer) {
+      nextPrayerEl.innerHTML = "No prayer times available";
+      return;
+    }
+
+    const now = new Date();
+    const currentTimeInMinutes =
+      now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+
+    let timeDiff = nextPrayer.time - currentTimeInMinutes;
+
+    if (timeDiff <= 0) {
+      // If time passed, get next prayer
+      const updatedNextPrayer = getNextPrayer();
+      if (!updatedNextPrayer) return;
+      timeDiff = updatedNextPrayer.time - currentTimeInMinutes;
+    }
+
+    const hours = Math.floor(timeDiff / 60);
+    const minutes = Math.floor(timeDiff % 60);
+    const seconds = Math.floor((timeDiff % 1) * 60);
+
+    const prayerName = nextPrayer.tomorrow
+      ? `${nextPrayer.name} (غداً)`
+      : nextPrayer.name;
+    nextPrayerEl.textContent = `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    nextPrayerNameEl.textContent = `Next Prayer: ${nextPrayer.name}`;
+    nextPrayerDayEl.textContent = nextPrayer.tomorrow
+      ? `Tomorrow ${nextPrayer.time}`
+      : `Today ${timeFormat(nextPrayer.timeString, typeCheckBtn.checked)}`;
+  };
+  updateCountdown();
+
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
 
 function clearOptions(select) {
   while (select.firstChild) {
@@ -54,6 +138,11 @@ function setAdhan(prayers, timeFormatChecked) {
     tr.appendChild(tdValue);
     prayerTableBody.appendChild(tr);
   });
+  prayerTimes = prayers.map((time, index) => ({
+    name: mainPrayers[index],
+    time: time,
+  }));
+  startPrayerCountdown();
 }
 
 // loading
