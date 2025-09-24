@@ -43,7 +43,6 @@ export function setSelection({
     ...(adhan !== undefined && { adhan }),
     ...(timeFormat !== undefined && { timeFormat }),
   };
-  console.log(newState, "wowowo");
 
   saveState(newState);
 }
