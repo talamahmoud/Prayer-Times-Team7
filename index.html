@@ -24,41 +24,55 @@
       <section class="controls" aria-label="Location selection options">
         <div class="field">
           <label for="continent">Continent</label>
-          <select id="continent" aria-label="Select continent">
-            <option value="">Select Continent</option>
-            <option value="africa">Africa</option>
-            <option value="americas">Americas</option>
-            <option value="asia">Asia</option>
-            <option value="europe">Europe</option>
-            <option value="oceania">Oceania</option>
-          </select>
+          <div class="select-wrapper">
+            <select id="continent" aria-label="Select continent">
+              <option value="">Select Continent</option>
+              <option value="africa">Africa</option>
+              <option value="americas">Americas</option>
+              <option value="asia">Asia</option>
+              <option value="europe">Europe</option>
+              <option value="oceania">Oceania</option>
+            </select>
+            <div class="select-spinner"></div>
+          </div>
         </div>
 
         <div class="field">
           <label for="country">Country</label>
-          <select id="country" aria-label="Select country">
-            <option value="">Select a continent first</option>
-          </select>
+          <div class="select-wrapper">
+            <select id="country" aria-label="Select country">
+              <option value="">Select a continent first</option>
+            </select>
+            <div class="select-spinner"></div>
+          </div>
         </div>
 
         <div class="field">
           <label for="city">City</label>
-          <select id="city" aria-label="Select city">
-            <option value="">Select a country first</option>
-          </select>
+          <div class="select-wrapper">
+            <select id="city" aria-label="Select city">
+              <option value="">Select a country first</option>
+            </select>
+            <div class="select-spinner"></div>
+          </div>
         </div>
 
         <div class="field">
           <label for="method">Calculation Method</label>
-          <select id="method" aria-label="Select calculation method">
-            <option value="">Select one</option>
-          </select>
+          <div class="select-wrapper">
+            <select id="method" aria-label="Select calculation method">
+              <option value="">Select one</option>
+            </select>
+            <div class="select-spinner"></div>
+          </div>
         </div>
+
         <label>
           <input type="checkbox" id="type-btn" />
           Do you want 24-hour format?
         </label>
       </section>
+
       <div class="actions">
         <button id="resetBtn" class="btn secondary" title="Reset">Reset</button>
       </div>
@@ -67,8 +81,8 @@
         <div class="next-banner">
           <div class="next-left">
             <i class="fa-regular fa-clock"></i>
-            <div class="prayer-name">Next Prayer: Asr</div>
-            <div class="next-prayer-day">Today — 15:30</div>
+            <div class="prayer-name"></div>
+            <div class="next-prayer-day"></div>
           </div>
           <div>
             <div class="countdown"></div>
@@ -85,10 +99,24 @@
                 <th>Time</th>
               </tr>
             </thead>
-            <tbody id="table-body"></tbody>
+            <tbody id="table-body">
+              <tr>
+                <td colspan="2" class="hint-cell">
+                   Please select your location and method to view prayer
+                  times.
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
+        <div
+          id="loading"
+          style="display: none; text-align: center; margin: 10px"
+        >
+          <div class="spinner"></div>
+        </div>
       </section>
+
       <footer>
         <small>Team 7</small>
       </footer>
