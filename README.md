@@ -53,6 +53,10 @@ project-root/
 - Modern web browser with ES6 module support.
 - Live server or any HTTP server for module imports.
 
+- ## 📸 Screenshots
+<img width="937" height="610" alt="image" src="https://github.com/user-attachments/assets/68c51635-ea06-4951-809e-aa8e3aee0b99" />
+
+
 
 ##  Installation & Usage
 1. **Clone the repo**
